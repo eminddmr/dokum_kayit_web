@@ -10,25 +10,24 @@ creds = ServiceAccountCredentials.from_json_keyfile_name("creds.json", scope)
 client = gspread.authorize(creds)
 sheet = client.open("dokum_kayit").sheet1  # sayfa adı
 
-# Başarı oranı ve hatalı kalıpları hesaplayan fonksiyon
-def analiz_et_kalip_matrisi(matrix_str):
-    values = matrix_str.split(",")
-    rows, cols = 6, 7
-    basarisiz = []
-    basarili_sayisi = 0
-
-    for i in range(rows):
-        for j in range(cols):
-            idx = i * cols + j
+def analiz_et_kalip_matrisi(dizi):
+    values = dizi.split(",")
+    toplam = 42
+    aktifler = []
+    for idx in range(toplam):
+        try:
             if values[idx] == "1":
-                basarili_sayisi += 1
-            else:
-                harf = chr(ord("A") + j)
-                basarisiz.append(f"{i+1}-{harf}")
-    
-    toplam = rows * cols
-    oran = f"{basarili_sayisi}/{toplam}"
-    return oran, ", ".join(basarisiz)
+                aktifler.append(idx)
+        except IndexError:
+            break  # Veri eksik gelirse döngüyü bitir
+    basarisizlar = [i for i in range(toplam) if i not in aktifler]
+    oran = f"{len(aktifler)}/{toplam}"
+    koordinatlar = []
+    for i in basarisizlar:
+        satir = i // 7 + 1
+        sutun = chr(ord("A") + i % 7)
+        koordinatlar.append(f"{satir}{sutun}")
+    return oran, ", ".join(koordinatlar)
 
 @app.route("/", methods=["GET", "POST"])
 def form():
