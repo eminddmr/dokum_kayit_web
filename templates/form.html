@@ -20,6 +20,7 @@
             cursor: default;
         }
         .matrix-table .selected {
+            .cell.active {
             background-color: lightcoral;
         }
     </style>
@@ -68,19 +69,23 @@
     </form>
 
     <script>
-        function toggleCell(cell) {
-            if (!cell.classList.contains("header")) {
-                cell.classList.toggle("selected");
-                updateMatrixData();
-            }
-        }
+    const matrix = document.getElementById("matrix");
+    const input = document.getElementById("kalipInput");
 
-        function updateMatrixData() {
-            const table = document.getElementById("matrix");
-            const cells = table.querySelectorAll("td");
-            const values = Array.from(cells).map(cell => cell.classList.contains("selected") ? "1" : "0");
-            document.getElementById("kalipInput").value = values.join(",");
-        }
-    </script>
+    function toggleCell(cell) {
+        cell.classList.toggle("active");
+        updateMatrixInput();
+    }
+
+    function updateMatrixInput() {
+        const cells = matrix.querySelectorAll(".cell");
+        const values = Array.from(cells).map(cell => cell.classList.contains("active") ? "1" : "0");
+        input.value = values.join(",");
+    }
+
+    // Sayfa yüklenirken boş da olsa input'u doldur:
+    updateMatrixInput();
+</script>
+
 </body>
 </html>
