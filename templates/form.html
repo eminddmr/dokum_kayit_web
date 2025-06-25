@@ -4,24 +4,28 @@
     <title>Döküm Kayıt Formu</title>
     <meta charset="UTF-8">
     <style>
-        .matrix-table {
-            border-collapse: collapse;
-            margin-top: 10px;
+        .matrix {
+            display: grid;
+            grid-template-columns: 30px repeat(7, 30px);
+            grid-gap: 3px;
+            margin-bottom: 10px;
         }
-        .matrix-table td, .matrix-table th {
-            border: 1px solid #999;
-            width: 35px;
-            height: 35px;
+        .label {
             text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+        }
+        .cell {
+            width: 30px;
+            height: 30px;
+            background-color: lightgray;
+            border: 1px solid #999;
             cursor: pointer;
+            text-align: center;
+            line-height: 30px;
         }
-        .matrix-table .header {
-            background-color: #eee;
-            cursor: default;
-        }
-        .matrix-table .selected {
-            .cell.active {
-            background-color: lightcoral;
+        .active {
+            background-color: red;
         }
     </style>
 </head>
@@ -43,49 +47,41 @@
         <label>Notlar:</label><br>
         <textarea name="notlar"></textarea><br><br>
 
-        <h3>Kalıp Başarı Matrisi (6x7) – <i>Başarısız kalıpları seç</i></h3>
+        <h3>Kalıp Başarı Matrisi (Başarısız olanları seçin)</h3>
 
-        <table class="matrix-table" id="matrix">
-            <tr>
-                <th class="header"></th>
-                {% for col in ['A','B','C','D','E','F','G'] %}
-                    <th class="header">{{ col }}</th>
-                {% endfor %}
-            </tr>
-            {% for row in range(1,7) %}
-            <tr>
-                <th class="header">{{ row }}</th>
-                {% for col in range(7) %}
-                    <td onclick="toggleCell(this)"></td>
-                {% endfor %}
-            </tr>
+        <div class="matrix" id="matrix">
+            <div></div>
+            {% for col in ['A', 'B', 'C', 'D', 'E', 'F', 'G'] %}
+                <div class="label">{{ col }}</div>
             {% endfor %}
-        </table>
+            {% for row in range(1, 7) %}
+                <div class="label">{{ row }}</div>
+                {% for col in range(7) %}
+                    <div class="cell" onclick="toggleCell(this)"></div>
+                {% endfor %}
+            {% endfor %}
+        </div>
 
         <input type="hidden" name="kalip" id="kalipInput">
-
-        <br>
         <button type="submit">Kaydet</button>
     </form>
 
     <script>
-    const matrix = document.getElementById("matrix");
-    const input = document.getElementById("kalipInput");
+        const matrix = document.getElementById("matrix");
+        const input = document.getElementById("kalipInput");
 
-    function toggleCell(cell) {
-        cell.classList.toggle("active");
-        updateMatrixInput();
-    }
+        function toggleCell(cell) {
+            cell.classList.toggle("active");
+            updateMatrixInput();
+        }
 
-    function updateMatrixInput() {
-        const cells = matrix.querySelectorAll(".cell");
-        const values = Array.from(cells).map(cell => cell.classList.contains("active") ? "1" : "0");
-        input.value = values.join(",");
-    }
-
-    // Sayfa yüklenirken boş da olsa input'u doldur:
-    updateMatrixInput();
-</script>
-
+        function updateMatrixInput() {
+            const cells = matrix.querySelectorAll(".cell");
+            const values = Array.from(cells).map(cell =>
+                cell.classList.contains("active") ? "1" : "0"
+            );
+            input.value = values.join(",");
+        }
+    </script>
 </body>
 </html>
