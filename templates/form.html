@@ -1,15 +1,30 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Döküm Kayıt Formu</title>
     <meta charset="UTF-8">
+    <title>Döküm Kayıt Formu</title>
     <style>
+        .matrix-container {
+            display: inline-block;
+            border: 1px solid #999;
+            margin-top: 10px;
+        }
+
+        .matrix-labels {
+            display: grid;
+            grid-template-columns: 30px repeat(7, 30px);
+        }
+
+        .matrix-labels div {
+            text-align: center;
+            font-weight: bold;
+        }
+
         .matrix {
             display: grid;
-            grid-template-columns: repeat(7, 30px);
-            grid-gap: 5px;
-            margin-bottom: 10px;
+            grid-template-columns: 30px repeat(7, 30px);
         }
+
         .cell {
             width: 30px;
             height: 30px;
@@ -20,14 +35,18 @@
             line-height: 30px;
             font-size: 14px;
         }
-        .active {
-            background-color: lightgreen;
+
+        .fail {
+            background-color: lightcoral;
         }
     </style>
 </head>
 <body>
     <h2>Döküm Kayıt Formu</h2>
     <form method="POST">
+        <label>Tarih:</label><br>
+        <input type="date" name="tarih" required><br><br>
+
         <label>Döküm No:</label><br>
         <input type="text" name="dokum_no" required><br><br>
 
@@ -37,16 +56,28 @@
         <label>Sıcaklık (°C):</label><br>
         <input type="text" name="sicaklik"><br><br>
 
+        <label>Kalıp Durumu (Başarısızları seç):</label><br>
+
+        <div class="matrix-container">
+            <div class="matrix-labels">
+                <div></div>
+                <div>A</div><div>B</div><div>C</div><div>D</div><div>E</div><div>F</div><div>G</div>
+            </div>
+            <div class="matrix" id="matrix">
+                {% for i in range(6) %}
+                    <div><strong>{{ i + 1 }}</strong></div>
+                    {% for j in range(7) %}
+                        <div class="cell" onclick="toggleCell(this)" data-label="{{ i + 1 }}{{ 'ABCDEFG'[j] }}"></div>
+                    {% endfor %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <input type="hidden" name="kalip" id="kalipInput">
+
+        <br><br>
         <label>Notlar:</label><br>
         <textarea name="notlar"></textarea><br><br>
-
-        <h3>Kalıp Başarı Matrisi (6x7)</h3>
-        <div class="matrix" id="matrix">
-            {% for i in range(42) %}
-                <div class="cell" onclick="toggleCell(this)"></div>
-            {% endfor %}
-        </div>
-        <input type="hidden" name="kalip" id="kalipInput">
 
         <button type="submit">Kaydet</button>
     </form>
@@ -56,14 +87,21 @@
         const input = document.getElementById("kalipInput");
 
         function toggleCell(cell) {
-            cell.classList.toggle("active");
+            cell.classList.toggle("fail");
             updateMatrixInput();
         }
 
         function updateMatrixInput() {
             const cells = matrix.querySelectorAll(".cell");
-            const values = Array.from(cells).map(cell => cell.classList.contains("active") ? "1" : "0");
-            input.value = values.join(",");
+            const failed = Array.from(cells)
+                .filter(cell => cell.classList.contains("fail"))
+                .map(cell => cell.dataset.label);
+
+            const total = cells.length;
+            const failCount = failed.length;
+            const successCount = total - failCount;
+
+            input.value = `Başarılı: ${successCount}/${total} | Başarısız: ${failCount} | Hatalı Kalıplar: ${failed.join(", ")}`;
         }
     </script>
 </body>
