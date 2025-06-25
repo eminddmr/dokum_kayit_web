@@ -1,42 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
     <title>Döküm Kayıt Formu</title>
+    <meta charset="UTF-8">
     <style>
-        .matrix-container {
-            display: inline-block;
-            border: 1px solid #999;
+        .matrix-table {
+            border-collapse: collapse;
             margin-top: 10px;
         }
-
-        .matrix-labels {
-            display: grid;
-            grid-template-columns: 30px repeat(7, 30px);
-        }
-
-        .matrix-labels div {
-            text-align: center;
-            font-weight: bold;
-        }
-
-        .matrix {
-            display: grid;
-            grid-template-columns: 30px repeat(7, 30px);
-        }
-
-        .cell {
-            width: 30px;
-            height: 30px;
-            background-color: lightgray;
+        .matrix-table td, .matrix-table th {
             border: 1px solid #999;
-            cursor: pointer;
+            width: 35px;
+            height: 35px;
             text-align: center;
-            line-height: 30px;
-            font-size: 14px;
+            cursor: pointer;
         }
-
-        .fail {
+        .matrix-table .header {
+            background-color: #eee;
+            cursor: default;
+        }
+        .matrix-table .selected {
             background-color: lightcoral;
         }
     </style>
@@ -56,52 +39,47 @@
         <label>Sıcaklık (°C):</label><br>
         <input type="text" name="sicaklik"><br><br>
 
-        <label>Kalıp Durumu (Başarısızları seç):</label><br>
-
-        <div class="matrix-container">
-            <div class="matrix-labels">
-                <div></div>
-                <div>A</div><div>B</div><div>C</div><div>D</div><div>E</div><div>F</div><div>G</div>
-            </div>
-            <div class="matrix" id="matrix">
-                {% for i in range(6) %}
-                    <div><strong>{{ i + 1 }}</strong></div>
-                    {% for j in range(7) %}
-                        <div class="cell" onclick="toggleCell(this)" data-label="{{ i + 1 }}{{ 'ABCDEFG'[j] }}"></div>
-                    {% endfor %}
-                {% endfor %}
-            </div>
-        </div>
-
-        <input type="hidden" name="kalip" id="kalipInput">
-
-        <br><br>
         <label>Notlar:</label><br>
         <textarea name="notlar"></textarea><br><br>
 
+        <h3>Kalıp Başarı Matrisi (6x7) – <i>Başarısız kalıpları seç</i></h3>
+
+        <table class="matrix-table" id="matrix">
+            <tr>
+                <th class="header"></th>
+                {% for col in ['A','B','C','D','E','F','G'] %}
+                    <th class="header">{{ col }}</th>
+                {% endfor %}
+            </tr>
+            {% for row in range(1,7) %}
+            <tr>
+                <th class="header">{{ row }}</th>
+                {% for col in range(7) %}
+                    <td onclick="toggleCell(this)"></td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+
+        <input type="hidden" name="kalip" id="kalipInput">
+
+        <br>
         <button type="submit">Kaydet</button>
     </form>
 
     <script>
-        const matrix = document.getElementById("matrix");
-        const input = document.getElementById("kalipInput");
-
         function toggleCell(cell) {
-            cell.classList.toggle("fail");
-            updateMatrixInput();
+            if (!cell.classList.contains("header")) {
+                cell.classList.toggle("selected");
+                updateMatrixData();
+            }
         }
 
-        function updateMatrixInput() {
-            const cells = matrix.querySelectorAll(".cell");
-            const failed = Array.from(cells)
-                .filter(cell => cell.classList.contains("fail"))
-                .map(cell => cell.dataset.label);
-
-            const total = cells.length;
-            const failCount = failed.length;
-            const successCount = total - failCount;
-
-            input.value = `Başarılı: ${successCount}/${total} | Başarısız: ${failCount} | Hatalı Kalıplar: ${failed.join(", ")}`;
+        function updateMatrixData() {
+            const table = document.getElementById("matrix");
+            const cells = table.querySelectorAll("td");
+            const values = Array.from(cells).map(cell => cell.classList.contains("selected") ? "1" : "0");
+            document.getElementById("kalipInput").value = values.join(",");
         }
     </script>
 </body>
