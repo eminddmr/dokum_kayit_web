@@ -21,8 +21,53 @@
 
         <label>Notlar:</label><br>
         <textarea name="notlar"></textarea><br><br>
-
-        <button type="submit">Kaydet</button>
-    </form>
 </body>
 </html>
+<h3>Kalıp Başarı Matrisi (6x7)</h3>
+<style>
+    .matrix {
+        display: grid;
+        grid-template-columns: repeat(7, 30px);
+        grid-gap: 5px;
+        margin-bottom: 10px;
+    }
+    .cell {
+        width: 30px;
+        height: 30px;
+        background-color: lightgray;
+        border: 1px solid #999;
+        cursor: pointer;
+        text-align: center;
+        line-height: 30px;
+        font-size: 14px;
+    }
+    .active {
+        background-color: lightgreen;
+    }
+</style>
+
+<div class="matrix" id="matrix">
+    <!-- 6x7 = 42 hücre -->
+    {% for i in range(42) %}
+        <div class="cell" onclick="toggleCell(this)"></div>
+    {% endfor %}
+</div>
+
+<!-- Gizli input (arka planda veri taşıyacak) -->
+<input type="hidden" name="kalip" id="kalipInput">
+
+<script>
+    const matrix = document.getElementById("matrix");
+    const input = document.getElementById("kalipInput");
+
+    function toggleCell(cell) {
+        cell.classList.toggle("active");
+        updateMatrixInput();
+    }
+
+    function updateMatrixInput() {
+        const cells = matrix.querySelectorAll(".cell");
+        const values = Array.from(cells).map(cell => cell.classList.contains("active") ? "1" : "0");
+        input.value = values.join(",");
+    }
+</script>
