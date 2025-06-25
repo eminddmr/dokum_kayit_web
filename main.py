@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 # Google Sheets bağlantısı
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-creds = ServiceAccountCredentials.from_json_keyfile_name("C:/Users/oztur/OneDrive/Masaüstü/dokum_kayit_web/creds.json", scope)
+creds = ServiceAccountCredentials.from_json_keyfile_name("creds.json", scope)
 client = gspread.authorize(creds)
 sheet = client.open("dokum_kayit").sheet1  # Sheet adını gerektiğinde değiştir
 
